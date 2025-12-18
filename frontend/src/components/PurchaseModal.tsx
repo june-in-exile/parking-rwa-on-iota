@@ -15,9 +15,9 @@ export default function PurchaseModal({ space, onClose, onSuccess }: Props) {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // IOTA 使用 MIST 作為最小單位 (1 IOTA = 1,000,000,000 MIST)
+  // IOTA 使用 MIST 作為最小單位 (1 IOTA = 1,000,000 MIST)
   const formatIOTA = (mist: number) => {
-    return (mist / 1_000_000_000).toFixed(4);
+    return (mist / 1_000_000).toFixed(2);
   };
 
   const handlePurchase = async () => {
@@ -25,7 +25,7 @@ export default function PurchaseModal({ space, onClose, onSuccess }: Props) {
     setError(null);
 
     try {
-      const tx = createPurchaseSpaceTx(space.id, space.price);
+      const tx = createPurchaseSpaceTx(space.id, BigInt(space.price));
 
       signAndExecute(
         {

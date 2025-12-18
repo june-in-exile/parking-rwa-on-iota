@@ -1,0 +1,87 @@
+.secondary-marketplace {
+    width: 100%;
+  }
+  
+  .marketplace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  .marketplace-header h2 {
+    color: #333;
+    font-size: 1.5rem;
+  }
+  
+  .marketplace-description {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .count-badge {
+    background: #4caf50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  
+  .space-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .loading-container,
+  .error-container,
+  .empty-container {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .loading-container p {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  .error-container {
+    color: #d32f2f;
+  }
+  
+  .empty-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    border: 1px solid #dee2e6;
+  }
+  
+  .empty-container h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-container p {
+    color: #666;
+    margin-bottom: 0;
+  }
+  

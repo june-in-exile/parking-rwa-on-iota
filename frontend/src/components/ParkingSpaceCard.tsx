@@ -7,17 +7,19 @@ import "./ParkingSpaceCard.css";
 
 interface Props {
   space: ParkingSpace;
+  onPurchaseSuccess?: () => void;
+  setActiveTab?: (tab: "browse" | "market" | "myspaces" | "mint") => void;
 }
 
-export default function ParkingSpaceCard({ space }: Props) {
+export default function ParkingSpaceCard({ space, onPurchaseSuccess, setActiveTab }: Props) {
   const currentAccount = useCurrentAccount();
   const [showPayment, setShowPayment] = useState(false);
   const [showPurchase, setShowPurchase] = useState(false);
   const isOwner = currentAccount?.address === space.owner;
 
-  // IOTA 使用 MIST 作為最小單位 (1 IOTA = 1,000,000,000 MIST)
+  // IOTA 使用 MIST 作為最小單位 (1 IOTA = 1,000,000 MIST)
   const formatIOTA = (mist: number) => {
-    return (mist / 1_000_000_000).toFixed(4);
+    return (mist / 1_000_000).toFixed(2);
   };
 
   return (
@@ -74,8 +76,8 @@ export default function ParkingSpaceCard({ space }: Props) {
               購買車位
             </button>
           )}
-          {isOwner && (
-            <button className="btn-secondary">
+          {isOwner && setActiveTab && (
+            <button className="btn-secondary" onClick={() => setActiveTab("myspaces")}>
               管理車位
             </button>
           )}
@@ -93,6 +95,7 @@ export default function ParkingSpaceCard({ space }: Props) {
         <PurchaseModal
           space={space}
           onClose={() => setShowPurchase(false)}
+          onSuccess={onPurchaseSuccess}
         />
       )}
     </>

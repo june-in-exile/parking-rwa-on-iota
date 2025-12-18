@@ -4,11 +4,12 @@ import WalletConnect from "./WalletConnect";
 import ParkingSpaceList from "./ParkingSpaceList";
 import MySpaces from "./MySpaces";
 import MintSpaceForm from "./MintSpaceForm";
+import SecondaryMarketplace from "./SecondaryMarketplace";
 import "./ParkingApp.css";
 
 export default function ParkingApp() {
   const currentAccount = useCurrentAccount();
-  const [activeTab, setActiveTab] = useState<"browse" | "myspaces" | "mint">("browse");
+  const [activeTab, setActiveTab] = useState<"browse" | "market" | "myspaces" | "mint">("market");
 
   if (!currentAccount) {
     return (
@@ -37,10 +38,16 @@ export default function ParkingApp() {
 
       <nav className="tab-nav">
         <button
+          className={`tab-button ${activeTab === "market" ? "active" : ""}`}
+          onClick={() => setActiveTab("market")}
+        >
+          二級市場
+        </button>
+        <button
           className={`tab-button ${activeTab === "browse" ? "active" : ""}`}
           onClick={() => setActiveTab("browse")}
         >
-          瀏覽停車格
+          所有停車格
         </button>
         <button
           className={`tab-button ${activeTab === "myspaces" ? "active" : ""}`}
@@ -57,9 +64,10 @@ export default function ParkingApp() {
       </nav>
 
       <main className="app-main">
-        {activeTab === "browse" && <ParkingSpaceList />}
-        {activeTab === "myspaces" && <MySpaces />}
-        {activeTab === "mint" && <MintSpaceForm />}
+        {activeTab === "browse" && <ParkingSpaceList setActiveTab={setActiveTab} />}
+        {activeTab === "market" && <SecondaryMarketplace setActiveTab={setActiveTab} />}
+        {activeTab === "myspaces" && <MySpaces setActiveTab={setActiveTab} />}
+        {activeTab === "mint" && <MintSpaceForm setActiveTab={setActiveTab} />}
       </main>
     </div>
   );

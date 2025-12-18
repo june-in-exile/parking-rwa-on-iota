@@ -27,7 +27,7 @@ export default function PaymentModal({ space, onClose }: Props) {
     setStatus("loading");
     setErrorMsg("");
 
-    const tx = createParkingPaymentTx(space.id, space.hourlyRate, hours);
+    const tx = createParkingPaymentTx(space.id, BigInt(space.hourlyRate), hours);
 
     signAndExecute(
       { transaction: tx as any },

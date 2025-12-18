@@ -1,9 +1,14 @@
 import { useMyParkingSpaces } from "../hooks/useParking";
+import { ParkingSpace } from "../types/parking";
 import MySpaceCard from "./MySpaceCard";
 import "./MySpaces.css";
 
-export default function MySpaces() {
-  const { data: mySpaces, isLoading, error } = useMyParkingSpaces();
+interface Props {
+  setActiveTab: (tab: "browse" | "market" | "myspaces" | "mint") => void;
+}
+
+export default function MySpaces({ setActiveTab }: Props) {
+  const { mySpaces, isLoading, error, refetch } = useMyParkingSpaces();
 
   if (isLoading) {
     return (
@@ -26,7 +31,10 @@ export default function MySpaces() {
     return (
       <div className="empty-container">
         <h3>您還沒有停車格資產</h3>
-        <p>前往「瀏覽停車格」頁面購買您的第一個停車格 RWA</p>
+        <p>立即去市場上選購，開始您的被動收入！</p>
+        <button className="btn-primary" onClick={() => setActiveTab("market")}>
+          前往二級市場
+        </button>
         <div className="benefits-box">
           <h4>擁有停車格的好處：</h4>
           <ul>
@@ -40,11 +48,11 @@ export default function MySpaces() {
     );
   }
 
-  const totalValue = mySpaces.reduce((sum, space) => sum + (space.price > 0 ? space.price : 0), 0);
-  const forSaleCount = mySpaces.filter(space => space.price > 0).length;
+  const totalValue = mySpaces.reduce((sum: number, space: ParkingSpace) => sum + (space.price > 0 ? space.price : 0), 0);
+  const forSaleCount = mySpaces.filter((space: ParkingSpace) => space.price > 0).length;
 
   const formatIOTA = (mist: number) => {
-    return (mist / 1_000_000_000).toFixed(4);
+    return (mist / 1_000_000).toFixed(2);
   };
 
   return (
@@ -68,8 +76,8 @@ export default function MySpaces() {
       </div>
 
       <div className="my-spaces-grid">
-        {mySpaces.map((space) => (
-          <MySpaceCard key={space.id} space={space} />
+        {mySpaces.map((space: ParkingSpace) => (
+          <MySpaceCard key={space.id} space={space} onActionSuccess={refetch} />
         ))}
       </div>
     </div>

@@ -1,8 +1,13 @@
 import { useAllParkingSpaces } from "../hooks/useParking";
+import { ParkingSpace } from "../types/parking";
 import ParkingSpaceCard from "./ParkingSpaceCard";
 import "./ParkingSpaceList.css";
 
-export default function ParkingSpaceList() {
+interface ParkingSpaceListProps {
+  setActiveTab: (tab: "browse" | "market" | "myspaces" | "mint") => void;
+}
+
+export default function ParkingSpaceList({ setActiveTab }: ParkingSpaceListProps) {
   const { data: spaces, isLoading, error } = useAllParkingSpaces();
 
   if (isLoading) {
@@ -46,8 +51,8 @@ export default function ParkingSpaceList() {
         <span className="count-badge">{spaces.length} 個車位</span>
       </div>
       <div className="space-grid">
-        {spaces.map((space) => (
-          <ParkingSpaceCard key={space.id} space={space} />
+        {spaces.map((space: ParkingSpace) => (
+          <ParkingSpaceCard key={space.id} space={space} setActiveTab={setActiveTab} />
         ))}
       </div>
     </div>

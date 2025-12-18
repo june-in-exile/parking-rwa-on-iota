@@ -3,7 +3,11 @@ import { useSignAndExecuteTransaction, useCurrentAccount } from "@iota/dapp-kit"
 import { createMintSpaceTx } from "../contracts/parking";
 import "./MintSpaceForm.css";
 
-export default function MintSpaceForm() {
+interface Props {
+  setActiveTab: (tab: "browse" | "market" | "myspaces" | "mint") => void;
+}
+
+export default function MintSpaceForm({ setActiveTab }: Props) {
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
@@ -13,7 +17,7 @@ export default function MintSpaceForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const MIST_PER_IOTA = 1_000_000_000;
+  const MIST_PER_IOTA = 1_000_000;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +66,9 @@ export default function MintSpaceForm() {
             setLocation("");
             setHourlyRate("");
             setPrice("");
+            setTimeout(() => {
+              setActiveTab("myspaces");
+            }, 2000);
           },
           onError: (error) => {
             console.error("鑄造失敗:", error);
@@ -79,7 +86,7 @@ export default function MintSpaceForm() {
         text: `交易建立失敗: ${error instanceof Error ? error.message : "未知錯誤"}`
       });
     } finally {
-      setIsSubmitting(false);
+      // Keep isSubmitting true until redirect
     }
   };
 
