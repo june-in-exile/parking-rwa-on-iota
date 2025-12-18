@@ -11,6 +11,7 @@ module parking_system::parking_rwa {
     /// 錯誤代碼
     const EIncorrectAmount: u64 = 0;
     const ENotOwner: u64 = 1;
+    const ENotOperator: u64 = 2;
 
     /// 停車場營運物件
     struct ParkingLot has key {
@@ -25,6 +26,7 @@ module parking_system::parking_rwa {
         location: String,
         hourly_rate: u64,
         owner: address,
+        price: u64, // 出售價格，0 表示不出售
     }
 
     /// 支付事件
@@ -44,6 +46,14 @@ module parking_system::parking_rwa {
         to: address,
     }
 
+    /// 購買事件
+    struct PurchaseEvent has copy, drop {
+        space_id: ID,
+        buyer: address,
+        seller: address,
+        price: u64,
+    }
+
     /// 初始化停車場 (由營運商執行)
     public fun create_lot(ctx: &mut TxContext) {
         let lot = ParkingLot {
@@ -54,19 +64,26 @@ module parking_system::parking_rwa {
         transfer::share_object(lot);
     }
 
-    /// 鑄造停車格並發行
+    /// 鑄造停車格並發行（只有營運商可以調用）
     public fun mint_space(
-        location: String, 
-        hourly_rate: u64, 
+        lot: &ParkingLot,
+        location: String,
+        hourly_rate: u64,
+        price: u64, // 初始銷售價格
         ctx: &mut TxContext
     ) {
+        // 權限檢查：只有營運商可以鑄造
+        assert!(lot.operator == tx_context::sender(ctx), ENotOperator);
+
         let space = ParkingSpace {
             id: object::new(ctx),
             location,
             hourly_rate,
             owner: tx_context::sender(ctx),
+            price,
         };
-        transfer::public_transfer(space, tx_context::sender(ctx));
+        // 將停車格設為共享物件，這樣任何人都可以與它互動
+        transfer::share_object(space);
     }
 
     /// 支付停車費並自動分潤
@@ -105,7 +122,46 @@ module parking_system::parking_rwa {
         });
     }
 
-    /// 轉讓停車格 (變更收益權持有者)
+    /// 設置停車格售價
+    public fun set_price(space: &mut ParkingSpace, price: u64, ctx: &mut TxContext) {
+        // 權限檢查：只有當前 owner 可以設置價格
+        assert!(space.owner == tx_context::sender(ctx), ENotOwner);
+        space.price = price;
+    }
+
+    /// 購買停車格
+    public fun purchase_space(
+        space: &mut ParkingSpace,
+        payment: Coin<IOTA>,
+        ctx: &mut TxContext
+    ) {
+        // 檢查是否在出售中
+        assert!(space.price > 0, EIncorrectAmount);
+
+        // 檢查支付金額是否正確
+        assert!(coin::value(&payment) == space.price, EIncorrectAmount);
+
+        let seller = space.owner;
+        let buyer = tx_context::sender(ctx);
+        let price = space.price;
+
+        // 將款項轉給賣家
+        transfer::public_transfer(payment, seller);
+
+        // 更新所有權
+        space.owner = buyer;
+        space.price = 0; // 購買後設為不出售
+
+        // 發出購買事件
+        event::emit(PurchaseEvent {
+            space_id: object::id(space),
+            buyer,
+            seller,
+            price,
+        });
+    }
+
+    /// 轉讓停車格 (變更收益權持有者) - 用於贈與或轉移
     public fun transfer_space(space: &mut ParkingSpace, to: address, ctx: &mut TxContext) {
         // 權限檢查：只有當前 owner 可以轉讓
         assert!(space.owner == tx_context::sender(ctx), ENotOwner);
