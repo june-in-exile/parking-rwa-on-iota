@@ -4,11 +4,11 @@ import { PACKAGE_ID, LOT_ID } from "../constants/ids";
 // 支付停車費
 export const createParkingPaymentTx = (
     spaceId: string,
-    hourlyRate: number,
+    hourlyRate: bigint,
     hours: number
 ) => {
     const tx = new Transaction();
-    const totalPrice = hourlyRate * hours;
+    const totalPrice = hourlyRate * BigInt(hours);
     const [payment] = tx.splitCoins(tx.gas, [totalPrice]);
 
     tx.moveCall({
@@ -27,7 +27,7 @@ export const createParkingPaymentTx = (
 // 購買停車格
 export const createPurchaseSpaceTx = (
     spaceId: string,
-    price: number
+    price: bigint
 ) => {
     const tx = new Transaction();
     const [payment] = tx.splitCoins(tx.gas, [price]);
@@ -35,7 +35,6 @@ export const createPurchaseSpaceTx = (
     tx.moveCall({
         target: `${PACKAGE_ID}::parking_rwa::purchase_space`,
         arguments: [
-            tx.object(LOT_ID),
             tx.object(spaceId),
             payment,
         ],
@@ -47,7 +46,7 @@ export const createPurchaseSpaceTx = (
 // 設定停車格售價
 export const createSetPriceTx = (
     spaceId: string,
-    newPrice: number
+    newPrice: bigint
 ) => {
     const tx = new Transaction();
 
@@ -83,8 +82,8 @@ export const createTransferSpaceTx = (
 // 鑄造停車格 (僅營運商可用)
 export const createMintSpaceTx = (
     location: string,
-    hourlyRate: number,
-    price: number
+    hourlyRate: bigint,
+    price: bigint
 ) => {
     const tx = new Transaction();
 

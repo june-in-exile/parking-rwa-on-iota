@@ -13,7 +13,6 @@ export default function MintSpaceForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // IOTA 使用 MIST 作為最小單位 (1 IOTA = 1,000,000,000 MIST)
   const MIST_PER_IOTA = 1_000_000_000;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,9 +45,9 @@ export default function MintSpaceForm() {
     setMessage(null);
 
     try {
-      // 將 IOTA 轉換為 MIST
-      const hourlyRateMist = Math.floor(hourlyRateNum * MIST_PER_IOTA);
-      const priceMist = Math.floor(priceNum * MIST_PER_IOTA);
+      // 將 IOTA 轉換為 MIST，並使用 BigInt
+      const hourlyRateMist = BigInt(Math.floor(hourlyRateNum * MIST_PER_IOTA));
+      const priceMist = BigInt(Math.floor(priceNum * MIST_PER_IOTA));
 
       const tx = createMintSpaceTx(location, hourlyRateMist, priceMist);
 
@@ -59,8 +58,7 @@ export default function MintSpaceForm() {
         {
           onSuccess: (result) => {
             console.log("鑄造成功:", result);
-            setMessage({ type: "success", text: `停車格鑄造成功！交易摘要: <a href="https://iotascan.com/testnet/tx/${result.digest}" target="_blank" rel="noopener noreferrer">${result.digest}</a>` });
-            // 清空表單
+            setMessage({ type: "success", text: `停車格鑄造成功！交易摘要: ${result.digest}` });
             setLocation("");
             setHourlyRate("");
             setPrice("");

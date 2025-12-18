@@ -1,2 +1,2 @@
-export const PACKAGE_ID = "0xfa039435957f50f38303389a6f06f0841812cc7e4dba4095059802680bb9af67";
-export const LOT_ID = "0x8ecb4cab5637f79f1c3a7e9a748d57dfeaf493eae3ffd6dc488015d587cf5b2e";
+export const PACKAGE_ID = "0x838151daef06aaa5f9dc20e24d33b905b305aaef5f9d1234230a4571aedd34c8";
+export const LOT_ID = "0xe2ee3d6f69e3621561ff63a4afea3f4ed365267130184dc1d673f470a9f82ae9";

@@ -25,6 +25,8 @@ function parseParkingSpace(obj: any): ParkingSpace | null {
 
 // 獲取所有停車格（從所有用戶中查詢）
 export function useAllParkingSpaces() {
+  const client = useIotaClient();
+
   return useQuery({
     queryKey: ["parkingSpaces", "all"],
     queryFn: async (): Promise<ParkingSpace[]> => {
@@ -34,21 +36,88 @@ export function useAllParkingSpaces() {
       }
 
       try {
-        // 使用 multiGetObjects 或者從事件中獲取所有停車格
-        // 由於 IOTA SDK 的限制，這裡先返回空數組，實際應用中需要：
-        // 1. 維護一個後端索引服務
-        // 2. 或者從合約事件中重建狀態
-        // 3. 或者讓用戶輸入停車格 ID 來查詢
-        console.warn("需要實作完整的索引服務來查詢所有停車格");
-        return [];
+        console.log("查詢 MintEvent 事件...");
+        const eventResponse = await client.queryEvents({
+          query: {
+            MoveEventType: `${PACKAGE_ID}::parking_rwa::MintEvent`,
+          },
+        });
+        console.log("事件查詢結果:", eventResponse);
+
+        const spaceIds = eventResponse.data.map(
+          (event) => (event.parsedJson?.space_id as string)
+        ).filter((id): id is string => !!id);
+        console.log("解析出的 Space IDs:", spaceIds);
+
+        if (spaceIds.length === 0) {
+          console.log("未找到任何 Space ID，返回空列表");
+          return [];
+        }
+
+        console.log("使用 multiGetObjects 批量獲取對象...");
+        const objectResponse = await client.multiGetObjects({
+          ids: spaceIds,
+          options: {
+            showContent: true,
+            showOwner: true,
+          },
+        });
+        console.log("對象獲取結果:", objectResponse);
+
+        const spaces = objectResponse.data
+          .map((obj) => parseParkingSpace(obj))
+          .filter((space): space is ParkingSpace => space !== null);
+        console.log("成功解析的停車格:", spaces);
+
+        return spaces;
       } catch (error) {
-        console.error("查詢停車格失敗:", error);
+        console.error("查詢所有停車格失敗:", error);
+        if (error instanceof Error && error.message.includes("multiGetObjects is not a function")) {
+          console.warn("multiGetObjects 不可用，退回到 getObject");
+          return fallbackGetAllSpaces(client);
+        }
         return [];
       }
     },
     enabled: !PACKAGE_ID.startsWith("0x..."),
-    refetchInterval: 10000, // 每 10 秒刷新一次
+    refetchInterval: 10000,
   });
+}
+
+// Fallback 函數：如果 multiGetObjects 不可用，則逐一獲取對象
+async function fallbackGetAllSpaces(client: any): Promise<ParkingSpace[]> {
+  try {
+    console.log("Fallback: 查詢 MintEvent 事件...");
+    const eventResponse = await client.queryEvents({
+      query: {
+        MoveEventType: `${PACKAGE_ID}::parking_rwa::MintEvent`,
+      },
+    });
+    console.log("Fallback: 事件查詢結果:", eventResponse);
+
+    const spaceIds = eventResponse.data.map(
+      (event) => (event.parsedJson?.space_id as string)
+    ).filter((id): id is string => !!id);
+    console.log("Fallback: 解析出的 Space IDs:", spaceIds);
+
+    const spacePromises = spaceIds.map(id =>
+      client.getObject({
+        id,
+        options: { showContent: true, showOwner: true },
+      })
+    );
+
+    const objects = await Promise.all(spacePromises);
+    console.log("Fallback: 對象獲取結果:", objects);
+    const spaces = objects
+      .map((obj) => parseParkingSpace(obj))
+      .filter((space): space is ParkingSpace => space !== null);
+    console.log("Fallback: 成功解析的停車格:", spaces);
+    return spaces;
+  } catch (error) {
+    console.error("Fallback 查詢停車格失敗:", error);
+    return [];
+  }
 }
 
 // 獲取用戶擁有的停車格
@@ -67,7 +136,6 @@ export function useMyParkingSpaces() {
         throw new Error("請先部署合約並更新 PACKAGE_ID");
       }
 
-      // 查詢用戶擁有的所有 ParkingSpace 對象
       const response = await client.getOwnedObjects({
         owner: currentAccount.address,
         filter: {

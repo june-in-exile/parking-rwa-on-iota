@@ -54,6 +54,14 @@ module parking_system::parking_rwa {
         price: u64,
     }
 
+    /// 鑄造事件
+    struct MintEvent has copy, drop {
+        space_id: ID,
+        location: String,
+        hourly_rate: u64,
+        price: u64,
+    }
+
     /// 初始化停車場 (由營運商執行)
     public fun create_lot(ctx: &mut TxContext) {
         let lot = ParkingLot {
@@ -77,11 +85,20 @@ module parking_system::parking_rwa {
 
         let space = ParkingSpace {
             id: object::new(ctx),
-            location,
+            location: location,
             hourly_rate,
             owner: tx_context::sender(ctx),
             price,
         };
+
+        // 發出鑄造事件
+        event::emit(MintEvent {
+            space_id: object::id(&space),
+            location: location,
+            hourly_rate,
+            price,
+        });
+        
         // 將停車格設為共享物件，這樣任何人都可以與它互動
         transfer::share_object(space);
     }
