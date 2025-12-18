@@ -17,7 +17,7 @@ export default function MintSpaceForm({ setActiveTab }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const MIST_PER_IOTA = 1_000_000;
+  const NANO_IOTA_PER_IOTA = 1_000_000_000;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,11 +49,11 @@ export default function MintSpaceForm({ setActiveTab }: Props) {
     setMessage(null);
 
     try {
-      // 將 IOTA 轉換為 MIST，並使用 BigInt
-      const hourlyRateMist = BigInt(Math.floor(hourlyRateNum * MIST_PER_IOTA));
-      const priceMist = BigInt(Math.floor(priceNum * MIST_PER_IOTA));
+      // 將 IOTA 轉換為 nanoIOTA，並使用 BigInt
+      const hourlyRateNanoIOTA = BigInt(Math.floor(hourlyRateNum * NANO_IOTA_PER_IOTA));
+      const priceNanoIOTA = BigInt(Math.floor(priceNum * NANO_IOTA_PER_IOTA));
 
-      const tx = createMintSpaceTx(location, hourlyRateMist, priceMist);
+      const tx = createMintSpaceTx(location, hourlyRateNanoIOTA, priceNanoIOTA);
 
       signAndExecute(
         {

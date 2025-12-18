@@ -17,9 +17,9 @@ export default function ParkingSpaceCard({ space, onPurchaseSuccess, setActiveTa
   const [showPurchase, setShowPurchase] = useState(false);
   const isOwner = currentAccount?.address === space.owner;
 
-  // IOTA 使用 MIST 作為最小單位 (1 IOTA = 1,000,000 MIST)
-  const formatIOTA = (mist: number) => {
-    return (mist / 1_000_000).toFixed(2);
+  // IOTA 使用 nanoIOTA 作為最小單位 (1 IOTA = 1,000,000,000 nanoIOTA)
+  const formatIOTA = (nanoIOTA: number) => {
+    return (nanoIOTA / 1_000_000_000).toFixed(2);
   };
 
   return (

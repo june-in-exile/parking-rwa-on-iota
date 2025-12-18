@@ -51,8 +51,8 @@ export default function MySpaces({ setActiveTab }: Props) {
   const totalValue = mySpaces.reduce((sum: number, space: ParkingSpace) => sum + (space.price > 0 ? space.price : 0), 0);
   const forSaleCount = mySpaces.filter((space: ParkingSpace) => space.price > 0).length;
 
-  const formatIOTA = (mist: number) => {
-    return (mist / 1_000_000).toFixed(2);
+  const formatIOTA = (nanoIOTA: number) => {
+    return (nanoIOTA / 1_000_000_000).toFixed(2);
   };
 
   return (

@@ -21,8 +21,8 @@ export default function MySpaceCard({ space, onActionSuccess }: Props) {
 
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
-  const formatIOTA = (mist: number) => {
-    return (mist / 1_000_000).toFixed(2);
+  const formatIOTA = (nanoIOTA: number) => {
+    return (nanoIOTA / 1_000_000_000).toFixed(2);
   };
 
   const handleCancelListing = () => {

@@ -10,8 +10,8 @@ interface Props {
   onSuccess?: () => void;
 }
 
-// 1 IOTA = 1,000,000 MIST
-const MIST_PER_IOTA = 1_000_000;
+// 1 IOTA = 1,000,000,000 nanoIOTA
+const NANO_IOTA_PER_IOTA = 1_000_000_000;
 
 export default function ListForSaleModal({ space, onClose, onSuccess }: Props) {
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
@@ -25,14 +25,14 @@ export default function ListForSaleModal({ space, onClose, onSuccess }: Props) {
       return;
     }
     
-    // 將 IOTA 價格轉換為 MIST
-    const priceMist = BigInt(Math.floor(parseFloat(priceIOTA) * MIST_PER_IOTA));
+    // 將 IOTA 價格轉換為 nanoIOTA
+    const priceNanoIOTA = BigInt(Math.floor(parseFloat(priceIOTA) * NANO_IOTA_PER_IOTA));
 
     setIsListing(true);
     setError(null);
 
     try {
-      const tx = createSetPriceTx(space.id, priceMist);
+      const tx = createSetPriceTx(space.id, priceNanoIOTA);
 
       signAndExecute(
         {
