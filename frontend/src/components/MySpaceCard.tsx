@@ -3,6 +3,7 @@ import { useSignAndExecuteTransaction } from "@iota/dapp-kit";
 import { ParkingSpace } from "../types/parking";
 import { createSetPriceTx, createTransferSpaceTx } from "../contracts/parking";
 import ListForSaleModal from "./ListForSaleModal";
+import { TransactionLink } from "./TransactionLink";
 import "./MySpaceCard.css";
 
 interface Props {
@@ -18,6 +19,7 @@ export default function MySpaceCard({ space, onActionSuccess }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isListModalOpen, setIsListModalOpen] = useState(false);
+  const [txDigest, setTxDigest] = useState<string>("");
 
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
@@ -34,8 +36,9 @@ export default function MySpaceCard({ space, onActionSuccess }: Props) {
     signAndExecute(
       { transaction: tx },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
           setMessage("下架成功！");
+          setTxDigest(result.digest);
           setIsLoading(false);
           onActionSuccess();
         },
@@ -62,11 +65,11 @@ export default function MySpaceCard({ space, onActionSuccess }: Props) {
     signAndExecute(
       { transaction: tx },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
           setMessage("轉讓成功！");
+          setTxDigest(result.digest);
           setIsLoading(false);
           setAddressInput("");
-          setActionType(null);
           onActionSuccess();
         },
         onError: (error) => {
@@ -123,32 +126,44 @@ export default function MySpaceCard({ space, onActionSuccess }: Props) {
         </div>
 
         {!actionType && (
-          <div className="card-actions">
-            {space.price > 0 ? (
-              <button
-                className="btn-action btn-cancel-sale"
-                onClick={handleCancelListing}
-                disabled={isLoading}
-              >
-                {isLoading ? '下架中...' : '下架'}
-              </button>
-            ) : (
+          <>
+            <div className="card-actions">
+              {space.price > 0 ? (
+                <button
+                  className="btn-action btn-cancel-sale"
+                  onClick={handleCancelListing}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '下架中...' : '下架'}
+                </button>
+              ) : (
+                <button
+                  className="btn-action"
+                  onClick={() => setIsListModalOpen(true)}
+                  disabled={isLoading}
+                >
+                  出售
+                </button>
+              )}
               <button
                 className="btn-action"
-                onClick={() => setIsListModalOpen(true)}
+                onClick={() => setActionType("transfer")}
                 disabled={isLoading}
               >
-                出售
+                轉讓
               </button>
+            </div>
+            {message && (
+              <div className={message.includes("成功") ? "success-msg" : "error-msg"} style={{ marginTop: "1rem" }}>
+                <p>{message}</p>
+                {message.includes("成功") && txDigest && (
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <TransactionLink digest={txDigest} />
+                  </div>
+                )}
+              </div>
             )}
-            <button
-              className="btn-action"
-              onClick={() => setActionType("transfer")}
-              disabled={isLoading}
-            >
-              轉讓
-            </button>
-          </div>
+          </>
         )}
 
         {actionType === "transfer" && (
@@ -162,7 +177,16 @@ export default function MySpaceCard({ space, onActionSuccess }: Props) {
               onChange={(e) => setAddressInput(e.target.value)}
               disabled={isLoading}
             />
-            {message && <p className={message.includes("成功") ? "success-msg" : "error-msg"}>{message}</p>}
+            {message && (
+              <div className={message.includes("成功") ? "success-msg" : "error-msg"}>
+                <p>{message}</p>
+                {message.includes("成功") && txDigest && (
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <TransactionLink digest={txDigest} />
+                  </div>
+                )}
+              </div>
+            )}
             <div className="action-buttons">
               <button
                 className="btn-cancel-action"

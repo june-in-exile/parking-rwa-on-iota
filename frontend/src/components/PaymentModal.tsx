@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSignAndExecuteTransaction } from "@iota/dapp-kit";
 import { ParkingSpace } from "../types/parking";
 import { createParkingPaymentTx } from "../contracts/parking";
+import { TransactionLink } from "./TransactionLink";
 import "./PaymentModal.css";
 
 interface Props {
@@ -146,8 +147,7 @@ export default function PaymentModal({ space, onClose }: Props) {
               <h3>支付成功！</h3>
               <p>您已成功支付 {hours} 小時的停車費</p>
               <div className="tx-info">
-                <span className="label">交易哈希:</span>
-                <code className="tx-hash">{txDigest.slice(0, 16)}...{txDigest.slice(-16)}</code>
+                <TransactionLink digest={txDigest} />
               </div>
               <button className="btn-close" onClick={handleClose}>
                 關閉
