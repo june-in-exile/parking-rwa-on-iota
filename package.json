@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@iota/dapp-kit": "^0.8.0",
+    "@iota/iota-sdk": "^1.9.1",
+    "@mysten/bcs": "^1.9.2"
+  }
+}
