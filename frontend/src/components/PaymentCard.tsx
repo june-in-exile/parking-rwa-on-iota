@@ -1,14 +1,14 @@
-import { useSignAndExecuteTransactionBlock } from "@iota/dapp-kit";
+import { useSignAndExecuteTransaction } from "@iota/dapp-kit";
 import { createParkingPaymentTx } from "../contracts/parking";
 
-export function PaymentCard({ space }) {
-    const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
+export function PaymentCard({ space }: { space: { id: string; hourlyRate: number } }) {
+    const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
     const handlePay = () => {
         const tx = createParkingPaymentTx(space.id, space.hourlyRate, 1); // 預設 1 小時
 
         signAndExecute(
-            { transactionBlock: tx },
+            { transaction: tx as any },
             {
                 onSuccess: (result) => console.log("支付成功", result.digest),
                 onError: (error) => console.error("支付失敗", error),

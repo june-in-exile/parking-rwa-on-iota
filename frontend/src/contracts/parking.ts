@@ -1,22 +1,79 @@
-import { TransactionBlock } from "@iota/iota-sdk/transactions";
+import { Transaction } from "@iota/iota-sdk/transactions";
 import { PACKAGE_ID, LOT_ID } from "../constants/ids";
 
+// 支付停車費
 export const createParkingPaymentTx = (
     spaceId: string,
     hourlyRate: number,
     hours: number
 ) => {
-    const tx = new TransactionBlock();
-    const totalPrice = BigInt(hourlyRate * hours);
-    const [payment] = tx.splitCoins(tx.gas, [tx.pure(totalPrice)]);
+    const tx = new Transaction();
+    const totalPrice = hourlyRate * hours;
+    const [payment] = tx.splitCoins(tx.gas, [totalPrice]);
 
     tx.moveCall({
         target: `${PACKAGE_ID}::parking_rwa::pay_for_parking`,
         arguments: [
             tx.object(LOT_ID),
             tx.object(spaceId),
-            tx.pure(BigInt(hours)),
+            tx.pure.u64(hours),
             payment,
+        ],
+    });
+
+    return tx;
+};
+
+// 購買停車格
+export const createPurchaseSpaceTx = (
+    spaceId: string,
+    price: number
+) => {
+    const tx = new Transaction();
+    const [payment] = tx.splitCoins(tx.gas, [price]);
+
+    tx.moveCall({
+        target: `${PACKAGE_ID}::parking_rwa::purchase_space`,
+        arguments: [
+            tx.object(LOT_ID),
+            tx.object(spaceId),
+            payment,
+        ],
+    });
+
+    return tx;
+};
+
+// 設定停車格售價
+export const createSetPriceTx = (
+    spaceId: string,
+    newPrice: number
+) => {
+    const tx = new Transaction();
+
+    tx.moveCall({
+        target: `${PACKAGE_ID}::parking_rwa::set_price`,
+        arguments: [
+            tx.object(spaceId),
+            tx.pure.u64(newPrice),
+        ],
+    });
+
+    return tx;
+};
+
+// 轉讓停車格
+export const createTransferSpaceTx = (
+    spaceId: string,
+    recipient: string
+) => {
+    const tx = new Transaction();
+
+    tx.moveCall({
+        target: `${PACKAGE_ID}::parking_rwa::transfer_space`,
+        arguments: [
+            tx.object(spaceId),
+            tx.pure.address(recipient),
         ],
     });
 

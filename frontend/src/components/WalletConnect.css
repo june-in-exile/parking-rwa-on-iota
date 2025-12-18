@@ -1,0 +1,26 @@
+.wallet-connect {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.account-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.account-address {
+  font-family: monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #667eea;
+}

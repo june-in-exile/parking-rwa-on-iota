@@ -1,0 +1,58 @@
+import { useState } from "react";
+import { useCurrentAccount } from "@iota/dapp-kit";
+import WalletConnect from "./WalletConnect";
+import ParkingSpaceList from "./ParkingSpaceList";
+import MySpaces from "./MySpaces";
+import "./ParkingApp.css";
+
+export default function ParkingApp() {
+  const currentAccount = useCurrentAccount();
+  const [activeTab, setActiveTab] = useState<"browse" | "myspaces">("browse");
+
+  if (!currentAccount) {
+    return (
+      <div className="app-container">
+        <header className="app-header">
+          <h1>🅿️ Parking RWA on IOTA</h1>
+          <p>停車格資產化平台</p>
+        </header>
+        <div className="connect-prompt">
+          <h2>歡迎使用停車格 RWA 平台</h2>
+          <p>請先連接您的 IOTA 錢包以開始使用</p>
+          <WalletConnect />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-container">
+      <header className="app-header">
+        <div>
+          <h1>🅿️ Parking RWA on IOTA</h1>
+        </div>
+        <WalletConnect />
+      </header>
+
+      <nav className="tab-nav">
+        <button
+          className={`tab-button ${activeTab === "browse" ? "active" : ""}`}
+          onClick={() => setActiveTab("browse")}
+        >
+          瀏覽停車格
+        </button>
+        <button
+          className={`tab-button ${activeTab === "myspaces" ? "active" : ""}`}
+          onClick={() => setActiveTab("myspaces")}
+        >
+          我的停車格
+        </button>
+      </nav>
+
+      <main className="app-main">
+        {activeTab === "browse" && <ParkingSpaceList />}
+        {activeTab === "myspaces" && <MySpaces />}
+      </main>
+    </div>
+  );
+}

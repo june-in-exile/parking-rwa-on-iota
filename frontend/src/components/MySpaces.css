@@ -1,0 +1,78 @@
+.my-spaces {
+  width: 100%;
+}
+
+.my-spaces-header {
+  margin-bottom: 2rem;
+}
+
+.my-spaces-header h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.my-spaces-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.benefits-box {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border: 2px solid #4caf50;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: left;
+  max-width: 600px;
+  margin: 2rem auto 0;
+}
+
+.benefits-box h4 {
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.benefits-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefits-box li {
+  color: #555;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+  line-height: 1.6;
+}
+
+.benefits-box li:last-child {
+  border-bottom: none;
+}
