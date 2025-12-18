@@ -79,3 +79,24 @@ export const createTransferSpaceTx = (
 
     return tx;
 };
+
+// 鑄造停車格 (僅營運商可用)
+export const createMintSpaceTx = (
+    location: string,
+    hourlyRate: number,
+    price: number
+) => {
+    const tx = new Transaction();
+
+    tx.moveCall({
+        target: `${PACKAGE_ID}::parking_rwa::mint_space`,
+        arguments: [
+            tx.object(LOT_ID),
+            tx.pure.string(location),
+            tx.pure.u64(hourlyRate),
+            tx.pure.u64(price),
+        ],
+    });
+
+    return tx;
+};

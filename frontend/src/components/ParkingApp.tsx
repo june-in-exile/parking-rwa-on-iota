@@ -3,11 +3,12 @@ import { useCurrentAccount } from "@iota/dapp-kit";
 import WalletConnect from "./WalletConnect";
 import ParkingSpaceList from "./ParkingSpaceList";
 import MySpaces from "./MySpaces";
+import MintSpaceForm from "./MintSpaceForm";
 import "./ParkingApp.css";
 
 export default function ParkingApp() {
   const currentAccount = useCurrentAccount();
-  const [activeTab, setActiveTab] = useState<"browse" | "myspaces">("browse");
+  const [activeTab, setActiveTab] = useState<"browse" | "myspaces" | "mint">("browse");
 
   if (!currentAccount) {
     return (
@@ -47,11 +48,18 @@ export default function ParkingApp() {
         >
           我的停車格
         </button>
+        <button
+          className={`tab-button ${activeTab === "mint" ? "active" : ""}`}
+          onClick={() => setActiveTab("mint")}
+        >
+          鑄造停車格
+        </button>
       </nav>
 
       <main className="app-main">
         {activeTab === "browse" && <ParkingSpaceList />}
         {activeTab === "myspaces" && <MySpaces />}
+        {activeTab === "mint" && <MintSpaceForm />}
       </main>
     </div>
   );

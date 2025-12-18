@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useCurrentAccount } from "@iota/dapp-kit";
 import { ParkingSpace } from "../types/parking";
 import PaymentModal from "./PaymentModal";
+import PurchaseModal from "./PurchaseModal";
 import "./ParkingSpaceCard.css";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 export default function ParkingSpaceCard({ space }: Props) {
   const currentAccount = useCurrentAccount();
   const [showPayment, setShowPayment] = useState(false);
+  const [showPurchase, setShowPurchase] = useState(false);
   const isOwner = currentAccount?.address === space.owner;
 
   // IOTA 使用 MIST 作為最小單位 (1 IOTA = 1,000,000,000 MIST)
@@ -65,7 +67,10 @@ export default function ParkingSpaceCard({ space }: Props) {
             </button>
           )}
           {!isOwner && space.price > 0 && (
-            <button className="btn-secondary">
+            <button
+              className="btn-secondary"
+              onClick={() => setShowPurchase(true)}
+            >
               購買車位
             </button>
           )}
@@ -81,6 +86,13 @@ export default function ParkingSpaceCard({ space }: Props) {
         <PaymentModal
           space={space}
           onClose={() => setShowPayment(false)}
+        />
+      )}
+
+      {showPurchase && (
+        <PurchaseModal
+          space={space}
+          onClose={() => setShowPurchase(false)}
         />
       )}
     </>
