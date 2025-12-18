@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSignAndExecuteTransaction, useCurrentAccount } from "@iota/dapp-kit";
 import { createMintSpaceTx } from "../contracts/parking";
+import { TransactionLink } from "./TransactionLink";
 import "./MintSpaceForm.css";
 
 interface Props {
@@ -16,6 +17,7 @@ export default function MintSpaceForm({ setActiveTab }: Props) {
   const [price, setPrice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [txDigest, setTxDigest] = useState<string>("");
 
   const NANO_IOTA_PER_IOTA = 1_000_000_000;
 
@@ -62,13 +64,11 @@ export default function MintSpaceForm({ setActiveTab }: Props) {
         {
           onSuccess: (result) => {
             console.log("鑄造成功:", result);
-            setMessage({ type: "success", text: `停車格鑄造成功！交易摘要: ${result.digest}` });
+            setTxDigest(result.digest);
+            setMessage({ type: "success", text: `停車格鑄造成功！` });
             setLocation("");
             setHourlyRate("");
             setPrice("");
-            setTimeout(() => {
-              setActiveTab("myspaces");
-            }, 2000);
           },
           onError: (error) => {
             console.error("鑄造失敗:", error);
@@ -150,6 +150,20 @@ export default function MintSpaceForm({ setActiveTab }: Props) {
       {message && (
         <div className={`message ${message.type}`}>
           {message.text}
+          {message.type === "success" && txDigest && (
+            <div style={{ marginTop: "1rem" }}>
+              <TransactionLink digest={txDigest} />
+            </div>
+          )}
+          {message.type === "success" && (
+            <button
+              onClick={() => setActiveTab("myspaces")}
+              className="btn-primary"
+              style={{ marginTop: "1rem" }}
+            >
+              查看我的停車格
+            </button>
+          )}
         </div>
       )}
     </div>
