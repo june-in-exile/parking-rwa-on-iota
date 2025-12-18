@@ -1,0 +1,20 @@
+import { useSignAndExecuteTransactionBlock } from "@iota/dapp-kit";
+import { createParkingPaymentTx } from "../contracts/parking";
+
+export function PaymentCard({ space }) {
+    const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
+
+    const handlePay = () => {
+        const tx = createParkingPaymentTx(space.id, space.hourlyRate, 1); // 預設 1 小時
+
+        signAndExecute(
+            { transactionBlock: tx },
+            {
+                onSuccess: (result) => console.log("支付成功", result.digest),
+                onError: (error) => console.error("支付失敗", error),
+            }
+        );
+    };
+
+    return <button onClick={handlePay}>立即支付 IOTA</button>;
+}
